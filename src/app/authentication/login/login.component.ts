@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LoginTrackerError } from 'src/app/helpers/LoginTrackerError';
+import { User } from 'src/app/models/User';
+import { LoginService } from 'src/app/services/login.service';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +18,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     public formBuilder: FormBuilder,
-    public route: Router
+    public route: Router,
+    private loginService: LoginService
   ) { }
 
   ngOnInit(): void {
@@ -32,8 +36,27 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  login(){
+  login(values) {
+    const requestLoginUser: User = {
+      email: values.email,
+      password: values.password,
+      token: ""
+    }
+
+    this.loginService.login(requestLoginUser)
+      .subscribe(
+        (user: User) => this.validUserConfirmed(user.token),
+        (error: LoginTrackerError) => this.errorMessageModal(error)
+      );
+  }
+
+  validUserConfirmed(token: string) {
+    this.loginService.saveJWTtokenInLocalStorage(token);
     this.route.navigate(['/homepage/homepage']);
+  }
+
+  errorMessageModal(error: LoginTrackerError) {
+    //this.errorMessageService.showAlertError(error.friendlyMessage);
   }
 
   validation_messages = {
