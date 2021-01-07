@@ -1,0 +1,20 @@
+.btn-login {
+    margin-top: 10px;
+    margin-left: 10px;
+    float: right;
+}
+
+.links {
+    display: block;
+    margin-top: 2rem;
+}
+
+.validation {
+    color: red;
+    font-size: 10px;
+}
+.block-login{
+    border: 1px solid #fafafa;
+    padding: 15px;
+    border-radius: 20px;
+}
