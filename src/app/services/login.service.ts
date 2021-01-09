@@ -4,20 +4,22 @@ import { Observable, throwError } from 'rxjs';
 import { LoginTrackerError } from '../helpers/LoginTrackerError';
 import { catchError, retry } from 'rxjs/operators';
 import { User } from '../models/User';
+import { LocalStoragePersistenceService } from './local-storage-persistence.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
 
-  private loginUrl = '';
+  private loginUrl = 'https://localhost:5001/api/login/login';
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private localStoragePersistenceService: LocalStoragePersistenceService
   ) { }
 
   login(pessoa: User): Observable<User | LoginTrackerError> {
@@ -36,7 +38,7 @@ export class LoginService {
       let dataError = new LoginTrackerError();
       dataError.errorNumber = 100;
       dataError.message = error.statusText;
-      dataError.friendlyMessage = "An error occurred while trying to book your class. Try again.";
+      dataError.friendlyMessage = "An error occurred while trying to Login. Try again.";
       return throwError(dataError);
     }
   }

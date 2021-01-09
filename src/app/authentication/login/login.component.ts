@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { LoginTrackerError } from 'src/app/helpers/LoginTrackerError';
 import { User } from 'src/app/models/User';
+import { LocalStoragePersistenceService } from 'src/app/services/local-storage-persistence.service';
 import { LoginService } from 'src/app/services/login.service';
 
 @Component({
@@ -14,12 +15,15 @@ export class LoginComponent implements OnInit {
 
   hide = true;
 
+  passwordEnrcrypt = "17132a0b-5ae9-4dcf-abbb-8ab8ea41831f";
+
   validations_form: FormGroup;
 
   constructor(
     public formBuilder: FormBuilder,
     public route: Router,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private localStorageService: LocalStoragePersistenceService
   ) { }
 
   ngOnInit(): void {
@@ -31,7 +35,6 @@ export class LoginComponent implements OnInit {
       password: new FormControl('', Validators.compose([
         Validators.minLength(5),
         Validators.required
-        //Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])[a-zA-Z0-9]+$')
       ]))
     });
   }
@@ -39,24 +42,26 @@ export class LoginComponent implements OnInit {
   login(values) {
     const requestLoginUser: User = {
       email: values.email,
-      password: values.password,
-      token: ""
+      password: values.password
     }
 
     this.loginService.login(requestLoginUser)
       .subscribe(
-        (user: User) => this.validUserConfirmed(user.token),
+        (user: User) => this.validUserConfirmed(user),
         (error: LoginTrackerError) => this.errorMessageModal(error)
       );
   }
 
-  validUserConfirmed(token: string) {
-    this.loginService.saveJWTtokenInLocalStorage(token);
+  validUserConfirmed(user: User) {
+    this.localStorageService.set("username", user.nome);
+    
+    this.loginService.saveJWTtokenInLocalStorage(user.token);
+
     this.route.navigate(['/homepage/homepage']);
   }
 
   errorMessageModal(error: LoginTrackerError) {
-    //this.errorMessageService.showAlertError(error.friendlyMessage);
+    console.log(error.friendlyMessage);
   }
 
   validation_messages = {
